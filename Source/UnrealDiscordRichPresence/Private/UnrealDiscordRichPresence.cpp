@@ -18,7 +18,7 @@ void FUnrealDiscordRichPresenceModule::StartupModule()
 	{
 		if (!World) return;
 
-		auto result = discord::Core::Create(1430314763975655465, DiscordCreateFlags_Default, &Core);
+		auto result = discord::Core::Create(1430593506191347843, DiscordCreateFlags_Default, &Core);
 		if (result != discord::Result::Ok)
 		{
 			UE_LOG(LogTemp, Error, TEXT("Discord core creation failed: %d"), (int)result);

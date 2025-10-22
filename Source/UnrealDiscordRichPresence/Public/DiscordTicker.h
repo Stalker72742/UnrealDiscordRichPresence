@@ -22,26 +22,7 @@ public:
 
 	virtual ETickableTickType GetTickableTickType() const override { return ETickableTickType::Always; }
 
-	virtual void Tick(float DeltaTime) override
-	{
-		if (!Core) return;
-
-		Core->RunCallbacks();
-
-		Accum += DeltaTime;
-		if (Accum >= 15.f)
-		{
-			Accum = 0.f;
-
-			discord::Activity activity{};
-			activity.SetState("Testing");
-			activity.SetDetails("Fruit Loops");
-
-			Core->ActivityManager().UpdateActivity(activity, [](discord::Result result) {
-				UE_LOG(LogTemp, Log, TEXT("Discord update result: %u"), (uint32)result);
-			});
-		}
-	}
+	virtual void Tick(float DeltaTime) override;
 
 	virtual TStatId GetStatId() const override
 	{
