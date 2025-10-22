@@ -10,7 +10,7 @@ void FDiscordTicker::Tick(float DeltaTime)
 	Core->RunCallbacks();
 
 	Accum += DeltaTime;
-	if (Accum >= 15.f)
+	if (Accum >= 1.f)
 	{
 		Accum = 0.f;
 		
