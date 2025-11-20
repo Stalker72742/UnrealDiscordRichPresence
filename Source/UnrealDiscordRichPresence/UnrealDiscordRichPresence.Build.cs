@@ -9,14 +9,13 @@ public class UnrealDiscordRichPresence : ModuleRules
 	{
 		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
 		
-		PublicIncludePaths.Add(Path.Combine(ModuleDirectory, "../UnrealDiscordRichPresence/DiscordSDK/cpp"));
-		
-		PublicAdditionalLibraries.Add(Path.Combine(ModuleDirectory, "../UnrealDiscordRichPresence/DiscordSDK/lib/discord_game_sdk.dll.lib"));
-		
 		PublicDependencyModuleNames.AddRange(
 			new string[]
 			{
 				"Core",
+				"DeveloperSettings",
+				"DiscordPartnerSDK",
+				"DiscordPartnerSDKLibrary"
 				// ... add other public dependencies that you statically link with here ...
 			}
 		);

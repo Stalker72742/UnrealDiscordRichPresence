@@ -3,29 +3,17 @@
 #include "UnrealDiscordRichPresence.h"
 #include "TickableEditorObject.h"
 
-#include "discord.h"
-#include "DiscordTicker.h"
-#define LOCTEXT_NAMESPACE "FUnrealDiscordRichPresenceModule"
+#include "Core/DiscordTicker.h"
 
-void FUnrealDiscordRichPresenceModule::funct(discord::Result result)
-{
-	UE_LOG(LogTemp, Log, TEXT("Rich presence core create result: %u"), result);
-}
+#define LOCTEXT_NAMESPACE "FUnrealDiscordRichPresenceModule"
 
 void FUnrealDiscordRichPresenceModule::StartupModule()
 {
-	FWorldDelegates::OnPostWorldInitialization.AddLambda([this](UWorld* World, const UWorld::InitializationValues IVS)
+	FWorldDelegates::OnWorldInitializedActors.AddLambda([this](const FActorsInitializedParams& IVS)
 	{
-		if (!World) return;
+		if (TickableEditorObject) return;
 
-		auto result = discord::Core::Create(1430593506191347843, DiscordCreateFlags_Default, &Core);
-		if (result != discord::Result::Ok)
-		{
-			UE_LOG(LogTemp, Error, TEXT("Discord core creation failed: %d"), (int)result);
-			return;
-		}
-
-		TickableEditorObject = new FDiscordTicker(Core);
+		TickableEditorObject = new FDiscordTicker();
 
 		UE_LOG(LogTemp, Log, TEXT("Discord module started"));
 	});
@@ -33,8 +21,7 @@ void FUnrealDiscordRichPresenceModule::StartupModule()
 
 void FUnrealDiscordRichPresenceModule::ShutdownModule()
 {
-	// This function may be called during shutdown to clean up your module.  For modules that support dynamic reloading,
-	// we call this function before unloading the module.
+	
 }
 
 #undef LOCTEXT_NAMESPACE
