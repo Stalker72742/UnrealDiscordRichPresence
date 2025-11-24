@@ -13,9 +13,19 @@ A plugin for Unreal Engine that displays Discord Rich Presence while you're work
 
 ## Installation
 
+### Prerequisites
+Download the Discord Social SDK from the Discord Developer Portal:
+1. Go to https://discord.com/developers/applications
+2. Select your application (or create one)
+3. Navigate to "Discord Social SDK" in the sidebar
+4. Download the latest SDK release
+5. Extract the SDK to `Plugins/DiscordSocial/Source/ThirdParty/`
+
+### Plugin Setup
 1. Copy the plugin to your project's `Plugins` folder
 2. Restart the editor
 3. Enable the plugin if it doesn't enable automatically
+
 
 ## Configuration
 
@@ -32,7 +42,6 @@ A plugin for Unreal Engine that displays Discord Rich Presence while you're work
 
 - Unreal Engine 5.6+
 - Discord Desktop client (browser version doesn't support Rich Presence)
-- Discord partner SDK(if you're going to modify the plugin or if you downloaded the source code)
 
 ## License
 
