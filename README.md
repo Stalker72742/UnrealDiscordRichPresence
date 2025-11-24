@@ -2,7 +2,7 @@
 
 A plugin for Unreal Engine that displays Discord Rich Presence while you're working in the editor. Let your friends know you're deep in development instead of ignoring their messages.
 
-**Supported Engine Versions:** Unreal Engine 5.6+
+**Supported Engine Versions:** Unreal Engine 5.6
 
 ## Features
 
