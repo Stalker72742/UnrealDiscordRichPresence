@@ -1,4 +1,4 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Created by Stalker7274
 
 #pragma once
 
@@ -18,8 +18,8 @@ public:
 
 protected:
 
-	FString DefaultState {"Editing BP_Character"};
-	FString DefaultDetails { "Shooter"};
+	FString DefaultState {"Editing blueprints..."};
+	FString DefaultDetails { "Working..."};
 
 	float TickInterval {0.5f};
 	

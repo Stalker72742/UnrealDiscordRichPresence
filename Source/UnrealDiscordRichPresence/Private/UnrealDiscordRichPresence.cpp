@@ -1,10 +1,11 @@
-﻿// Copyright Epic Games, Inc. All Rights Reserved.
+﻿// Created by Stalker7274
 
 #include "UnrealDiscordRichPresence.h"
 #include "TickableEditorObject.h"
 
 #include "Core/DiscordTicker.h"
 #include "Data/PresenceSettings.h"
+#include "Data/UnrealPresenceLog.h"
 
 #define LOCTEXT_NAMESPACE "FUnrealDiscordRichPresenceModule"
 
@@ -16,18 +17,22 @@ void FUnrealDiscordRichPresenceModule::RestartPresence(bool bNeedRecreate)
 		{
 			delete TickableEditorObject;
 			TickableEditorObject = nullptr;
+
+			UE_LOG(LogUnrealPresence, Log, TEXT("Discord presence deleted"));
 		}
 		
 		if (PresenceSettings->bShowPresence)
 		{
 			TickableEditorObject = new FDiscordTicker();
 
-			UE_LOG(LogTemp, Log, TEXT("Discord presence recreated"));
+			UE_LOG(LogUnrealPresence, Log, TEXT("Discord presence recreated"));
 		}
 	}
 	else
 	{
 		TickableEditorObject->UpdateActivity();
+		
+		UE_LOG(LogUnrealPresence, Log, TEXT("Discord presence updated"));
 	}
 }
 
@@ -45,14 +50,15 @@ void FUnrealDiscordRichPresenceModule::StartupModule()
 
 				TickableEditorObject = new FDiscordTicker();
 
-				UE_LOG(LogTemp, Log, TEXT("Discord module started"));
+				UE_LOG(LogUnrealPresence, Log, TEXT("Discord presence started"));
 			});
 		}
 
 		PresenceSettings->OnSettingsChangedDelegate.AddRaw(this, &FUnrealDiscordRichPresenceModule::RestartPresence);
+	}else
+	{
+		UE_LOG(LogUnrealPresence, Error, TEXT("Discord presence settings not valid"));
 	}
-	
-	
 }
 
 void FUnrealDiscordRichPresenceModule::ShutdownModule()

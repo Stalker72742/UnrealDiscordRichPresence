@@ -1,10 +1,11 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Created by Stalker7274
 
 
 #include "Core/DiscordTicker.h"
 
 #include "DiscordUnreal.h"
 #include "Data/PresenceSettings.h"
+#include "Data/UnrealPresenceLog.h"
 
 FDiscordTicker::FDiscordTicker() 
 {
@@ -17,7 +18,7 @@ FDiscordTicker::FDiscordTicker()
 	}
 	else
 	{
-		UE_LOG(LogTemp, Error, TEXT("No presence settings found"));
+		UE_LOG(LogUnrealPresence, Error, TEXT("No presence settings found"));
 		return;
 	}
 
@@ -40,17 +41,23 @@ FDiscordTicker::FDiscordTicker()
 	
 	if (!SavedRefreshToken.IsEmpty())
 	{
+		UE_LOG(LogUnrealPresence, Log, TEXT("Found token. Trying refresh token"));
+		
 		Client->RefreshToken(AppId, SavedRefreshToken, 
 			FDiscordClientTokenExchangeCallback::CreateRaw(this, &FDiscordTicker::OnDiscordTokenExchangeResult));
 	}
 	else
 	{
+		UE_LOG(LogUnrealPresence, Log, TEXT("Fail to find token. Authorizing..."));
+		
 		Client->Authorize(AuthArgs, FDiscordClientAuthorizationCallback::CreateRaw(this, &FDiscordTicker::OnAuthorization));
 	}
 }
 
 FDiscordTicker::~FDiscordTicker()
 {
+	UE_LOG(LogUnrealPresence, Log, TEXT("Destroying discord presence"));
+	
 	if (Client)
 	{
 		Client->Disconnect();
@@ -64,7 +71,7 @@ void FDiscordTicker::OnDiscordTokenExchangeResult(UDiscordClientResult* InResult
                                                   FString InRefreshToken, EDiscordAuthorizationTokenType InTokenType, int32 InExpiresIn, FString InScop)
 {
 	if (!InResult->Successful()) {
-		UE_LOG(LogTemp, Error, TEXT("Discord token exchange failed: %s"), *InResult->Error());
+		UE_LOG(LogUnrealPresence, Error, TEXT("Discord token exchange failed: %s"), *InResult->Error());
 	}
 
 	if (!InRefreshToken.IsEmpty())
@@ -80,18 +87,19 @@ void FDiscordTicker::OnDiscordTokenExchangeResult(UDiscordClientResult* InResult
 void FDiscordTicker::OnUpdateTokenResult(UDiscordClientResult* InResult)
 {
 	Client->Connect();
-
 	bConnected = true;
+
+	UE_LOG(LogUnrealPresence, Log, TEXT("Presence connected to discord client")); 
 }
 
 void FDiscordTicker::OnAuthorization(UDiscordClientResult* InResult, FString InCode, FString InRedirectUri)
 {
 	if (!InResult->Successful()) {
-		UE_LOG(LogTemp, Error, TEXT("Discord authorization failed: %s"), *InResult->Error());
+		UE_LOG(LogUnrealPresence, Error, TEXT("Discord authorization failed: %s"), *InResult->Error());
 		return;
 	}
 
-	UE_LOG(LogTemp, Log, TEXT("Authorization successful! Getting access token..."));
+	UE_LOG(LogUnrealPresence, Log, TEXT("Authorization successful! Getting access token..."));
 	Client->GetToken(AppId, InCode,  CodeVerifier->Verifier(), InRedirectUri,
 		FDiscordClientTokenExchangeCallback::CreateRaw(this, &FDiscordTicker::OnDiscordTokenExchangeResult));
 }
@@ -140,25 +148,25 @@ void FDiscordTicker::UpdateActivity()
 void FDiscordTicker::OnStatusChanged(EDiscordClientStatus Status, EDiscordClientError Error, int32 ErrorDetail) {
 	
 	if (Status == EDiscordClientStatus::Ready) {
-		UE_LOG(LogTemp, Log, TEXT("Connected to Discord! Ready to go! You can now start using Discord features."));
+		UE_LOG(LogUnrealPresence, Log, TEXT("Connected to Discord! Ready to go! You can now start using Discord features."));
 
 		UpdateActivity();
 	}
 	else if (Error != EDiscordClientError::None) {
-		UE_LOG(LogTemp, Log, TEXT("Connection error: %s (Detail: %d)"), *UEnum::GetValueAsString(Error), ErrorDetail);
+		UE_LOG(LogUnrealPresence, Log, TEXT("Connection error: %s (Detail: %d)"), *UEnum::GetValueAsString(Error), ErrorDetail);
 	}
 	else
 	{
-		UE_LOG(LogTemp, Log, TEXT("Connection status: %s"), *UEnum::GetValueAsString(Status));
+		UE_LOG(LogUnrealPresence, Log, TEXT("Connection status: %s"), *UEnum::GetValueAsString(Status));
 	}
 }
 
 void FDiscordTicker::OnUpdateRichPresenceResult(UDiscordClientResult* InResult)
 {
 	if (InResult->Successful()) {
-		UE_LOG(LogTemp, Log, TEXT("Rich Presence updated successfully!"));
+		UE_LOG(LogUnrealPresence, Log, TEXT("Rich Presence updated successfully!"));
 	} else {
-		UE_LOG(LogTemp, Error, TEXT("Rich Presence update failed"));
+		UE_LOG(LogUnrealPresence, Error, TEXT("Rich Presence update failed"));
 	}
 }
 

@@ -16,8 +16,14 @@
 	"Modules": [
 		{
 			"Name": "UnrealDiscordRichPresence",
-			"Type": "Runtime",
+			"Type": "Editor",
 			"LoadingPhase": "Default"
+		}
+	],
+	"Plugins": [
+		{
+			"Name": "DiscordPartnerSDK",
+			"Enabled": true
 		}
 	]
 }

@@ -1,4 +1,4 @@
-﻿// Copyright Epic Games, Inc. All Rights Reserved.
+﻿// Created by Stalker7274
 
 #pragma once
 
@@ -11,8 +11,7 @@ class FUnrealDiscordRichPresenceModule : public IModuleInterface
 {
 
 protected:
-
-
+	
 	UPresenceSettings* PresenceSettings {nullptr};
 	
 protected:

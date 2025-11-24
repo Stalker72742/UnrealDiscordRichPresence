@@ -1,4 +1,4 @@
-﻿// Copyright Epic Games, Inc. All Rights Reserved.
+﻿// Created by Stalker7274
 
 using System.IO;
 using UnrealBuildTool;
@@ -16,7 +16,6 @@ public class UnrealDiscordRichPresence : ModuleRules
 				"DeveloperSettings",
 				"DiscordPartnerSDK",
 				"DiscordPartnerSDKLibrary"
-				// ... add other public dependencies that you statically link with here ...
 			}
 		);
 			
@@ -29,16 +28,7 @@ public class UnrealDiscordRichPresence : ModuleRules
 				"Slate",
 				"SlateCore",
 				"UnrealEd"
-				// ... add private dependencies that you statically link with here ...	
 			}
-			);
-		
-		
-		DynamicallyLoadedModuleNames.AddRange(
-			new string[]
-			{
-				// ... add any modules that your module loads dynamically here ...
-			}
-			);
+		);
 	}
 }
