@@ -18,8 +18,8 @@ Download the Discord Social SDK from the Discord Developer Portal:
 1. Go to https://discord.com/developers/applications
 2. Select your application (or create one)
 3. Navigate to "Discord Social SDK" in the sidebar
-4. Download the latest SDK release
-5. Extract the SDK to `Plugins/DiscordSocial/Source/ThirdParty/`
+4. Download the latest Discord social SDK plugin release
+5. Copy the plugin to your project's `Plugins` folder
 
 ### Plugin Setup
 1. Copy the plugin to your project's `Plugins` folder
