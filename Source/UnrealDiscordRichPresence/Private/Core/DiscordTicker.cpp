@@ -49,8 +49,19 @@ FDiscordTicker::FDiscordTicker()
 	}
 }
 
+FDiscordTicker::~FDiscordTicker()
+{
+	if (Client)
+	{
+		Client->Disconnect();
+		Client->RemoveFromRoot();
+		Client->MarkAsGarbage();  
+		Client = nullptr;
+	}
+}
+
 void FDiscordTicker::OnDiscordTokenExchangeResult(UDiscordClientResult* InResult, FString InAccessToken,
-	FString InRefreshToken, EDiscordAuthorizationTokenType InTokenType, int32 InExpiresIn, FString InScop)
+                                                  FString InRefreshToken, EDiscordAuthorizationTokenType InTokenType, int32 InExpiresIn, FString InScop)
 {
 	if (!InResult->Successful()) {
 		UE_LOG(LogTemp, Error, TEXT("Discord token exchange failed: %s"), *InResult->Error());
@@ -69,6 +80,8 @@ void FDiscordTicker::OnDiscordTokenExchangeResult(UDiscordClientResult* InResult
 void FDiscordTicker::OnUpdateTokenResult(UDiscordClientResult* InResult)
 {
 	Client->Connect();
+
+	bConnected = true;
 }
 
 void FDiscordTicker::OnAuthorization(UDiscordClientResult* InResult, FString InCode, FString InRedirectUri)
@@ -93,8 +106,32 @@ void FDiscordTicker::UpdateActivity()
 	UDiscordActivity* Activity = NewObject<UDiscordActivity>();
 	Activity->Init();
 	Activity->SetType(EDiscordActivityTypes::Playing);
-	Activity->SetState(CurrentState);
-	Activity->SetDetails(CurrentDetails);
+	
+	if (auto presenceSettings = GetDefault<UPresenceSettings>())
+	{
+		if (presenceSettings->bUseCustomDetails)
+		{
+			Activity->SetDetails(presenceSettings->CustomDetails);
+		}
+		else
+		{
+			Activity->SetDetails(CurrentDetails);
+		}
+
+		if (presenceSettings->bUseCustomState)
+		{
+			Activity->SetState(presenceSettings->CustomState);
+		}
+		else
+		{
+			Activity->SetState(CurrentState);
+		}
+	}
+	else
+	{
+		Activity->SetDetails(CurrentDetails);
+		Activity->SetState(CurrentState);
+	}
 
 	Client->UpdateRichPresence(Activity, FDiscordClientUpdateRichPresenceCallback::CreateRaw(
 		this, &FDiscordTicker::OnUpdateRichPresenceResult));

@@ -14,6 +14,7 @@ class FDiscordTicker : public FTickableEditorObject
 {
 public:
 	FDiscordTicker();
+	~FDiscordTicker();
 
 protected:
 
@@ -33,9 +34,7 @@ protected:
 	UDiscordClient* Client;
 	UDiscordAuthorizationCodeVerifier* CodeVerifier;
 
-protected:
-
-	virtual void UpdateActivity();
+	bool bConnected {false};
 
 protected:
 
@@ -56,6 +55,11 @@ public:
 	
 public:
 
+	virtual void UpdateActivity();
 	virtual void SetState(FString InNewState);
 	virtual void SetDetails(FString InNewDetails);
+
+public:
+
+	bool IsConnected() const { return bConnected; }
 };
