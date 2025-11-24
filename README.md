@@ -32,6 +32,7 @@ A plugin for Unreal Engine that displays Discord Rich Presence while you're work
 
 - Unreal Engine 5.6+
 - Discord Desktop client (browser version doesn't support Rich Presence)
+- Discord partner SDK(if you're going to modify the plugin or if you downloaded the source code)
 
 ## License
 
