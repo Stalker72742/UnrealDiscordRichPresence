@@ -17,10 +17,7 @@ public:
 	~FDiscordTicker();
 
 protected:
-
-	FString DefaultState {"Editing blueprints..."};
-	FString DefaultDetails { "Working..."};
-
+	
 	float TickInterval {0.5f};
 	
 protected:
@@ -28,6 +25,8 @@ protected:
 
 	FString CurrentState;
 	FString CurrentDetails;
+
+	int64 StartTimestamp;
 	
 	float TimeSinceLastUpdate {0.0f};
 	

@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "Core/FAssetFocusTracker.h"
 #include "Modules/ModuleManager.h"
 
 class UPresenceSettings;
@@ -24,4 +25,5 @@ public:
 	virtual void ShutdownModule() override;
 
 	FDiscordTicker* TickableEditorObject {nullptr};
+	FAssetFocusTracker* FocusTrackerObject {nullptr};
 };

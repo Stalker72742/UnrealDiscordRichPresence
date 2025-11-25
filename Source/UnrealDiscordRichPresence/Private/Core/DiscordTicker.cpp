@@ -9,8 +9,10 @@
 
 FDiscordTicker::FDiscordTicker() 
 {
-	CurrentState = DefaultState;
-	CurrentDetails = DefaultDetails;
+	CurrentDetails = FApp::GetProjectName();
+	CurrentState = "Idle";
+
+	StartTimestamp = FDateTime::UtcNow().ToUnixTimestamp();
 
 	if (auto presenceSettings = GetDefault<UPresenceSettings>())
 	{
@@ -57,12 +59,21 @@ FDiscordTicker::FDiscordTicker()
 FDiscordTicker::~FDiscordTicker()
 {
 	UE_LOG(LogUnrealPresence, Log, TEXT("Destroying discord presence"));
-	
-	if (Client)
+
+	// Crash without !IsEngineExitRequested()
+	if (Client && IsValid(Client) && !IsEngineExitRequested())
 	{
-		Client->Disconnect();
+		if (bConnected)
+		{
+			if (!IsValid(Client))
+			{
+				Client->Disconnect();
+			}
+			bConnected = false;
+		}
+        
 		Client->RemoveFromRoot();
-		Client->MarkAsGarbage();  
+		Client->MarkAsGarbage();
 		Client = nullptr;
 	}
 }
@@ -88,7 +99,7 @@ void FDiscordTicker::OnUpdateTokenResult(UDiscordClientResult* InResult)
 {
 	Client->Connect();
 	bConnected = true;
-
+	
 	UE_LOG(LogUnrealPresence, Log, TEXT("Presence connected to discord client")); 
 }
 
@@ -114,6 +125,7 @@ void FDiscordTicker::UpdateActivity()
 	UDiscordActivity* Activity = NewObject<UDiscordActivity>();
 	Activity->Init();
 	Activity->SetType(EDiscordActivityTypes::Playing);
+	Activity->AddToRoot();
 	
 	if (auto presenceSettings = GetDefault<UPresenceSettings>())
 	{
@@ -140,6 +152,13 @@ void FDiscordTicker::UpdateActivity()
 		Activity->SetDetails(CurrentDetails);
 		Activity->SetState(CurrentState);
 	}
+	
+	UDiscordActivityTimestamps* Timestamps = NewObject<UDiscordActivityTimestamps>();
+	Timestamps->Init();
+
+	Timestamps->SetStart(StartTimestamp);
+	
+	Activity->SetTimestamps(Timestamps);
 
 	Client->UpdateRichPresence(Activity, FDiscordClientUpdateRichPresenceCallback::CreateRaw(
 		this, &FDiscordTicker::OnUpdateRichPresenceResult));
@@ -154,6 +173,7 @@ void FDiscordTicker::OnStatusChanged(EDiscordClientStatus Status, EDiscordClient
 	}
 	else if (Error != EDiscordClientError::None) {
 		UE_LOG(LogUnrealPresence, Log, TEXT("Connection error: %s (Detail: %d)"), *UEnum::GetValueAsString(Error), ErrorDetail);
+		bConnected = false; 
 	}
 	else
 	{

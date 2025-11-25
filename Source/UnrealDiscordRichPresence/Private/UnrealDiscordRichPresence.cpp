@@ -4,10 +4,13 @@
 #include "TickableEditorObject.h"
 
 #include "Core/DiscordTicker.h"
+#include "Core/FAssetFocusTracker.h"
 #include "Data/PresenceSettings.h"
 #include "Data/UnrealPresenceLog.h"
 
 #define LOCTEXT_NAMESPACE "FUnrealDiscordRichPresenceModule"
+
+DEFINE_LOG_CATEGORY(LogUnrealPresence);
 
 void FUnrealDiscordRichPresenceModule::RestartPresence(bool bNeedRecreate)
 {
@@ -16,7 +19,10 @@ void FUnrealDiscordRichPresenceModule::RestartPresence(bool bNeedRecreate)
 		if (TickableEditorObject && TickableEditorObject->IsConnected())
 		{
 			delete TickableEditorObject;
+			delete FocusTrackerObject;
+			
 			TickableEditorObject = nullptr;
+			FocusTrackerObject = nullptr;
 
 			UE_LOG(LogUnrealPresence, Log, TEXT("Discord presence deleted"));
 		}
@@ -24,6 +30,18 @@ void FUnrealDiscordRichPresenceModule::RestartPresence(bool bNeedRecreate)
 		if (PresenceSettings->bShowPresence)
 		{
 			TickableEditorObject = new FDiscordTicker();
+
+			FocusTrackerObject = new FAssetFocusTracker();
+			FocusTrackerObject->OnAssetFocusChanged.BindLambda([this](const FString& AssetName)
+			{
+				UE_LOG(LogTemp, Log, TEXT("Focused: %s"), *AssetName);
+
+				if (TickableEditorObject)
+				{
+					TickableEditorObject->SetState(AssetName);
+				}
+			});
+			FocusTrackerObject->Initialize();
 
 			UE_LOG(LogUnrealPresence, Log, TEXT("Discord presence recreated"));
 		}
@@ -51,6 +69,18 @@ void FUnrealDiscordRichPresenceModule::StartupModule()
 				TickableEditorObject = new FDiscordTicker();
 
 				UE_LOG(LogUnrealPresence, Log, TEXT("Discord presence started"));
+
+				FocusTrackerObject = new FAssetFocusTracker();
+				FocusTrackerObject->OnAssetFocusChanged.BindLambda([this](const FString& AssetName)
+				{
+					UE_LOG(LogUnrealPresence, Log, TEXT("Focused: %s"), *AssetName);
+
+					if (TickableEditorObject)
+					{
+						TickableEditorObject->SetState(AssetName);
+					}
+				});
+				FocusTrackerObject->Initialize();
 			});
 		}
 
@@ -63,7 +93,15 @@ void FUnrealDiscordRichPresenceModule::StartupModule()
 
 void FUnrealDiscordRichPresenceModule::ShutdownModule()
 {
-	
+	if (TickableEditorObject)
+	{
+		delete TickableEditorObject;
+	}
+
+	if (FocusTrackerObject)
+	{
+		delete FocusTrackerObject;
+	}
 }
 
 #undef LOCTEXT_NAMESPACE
