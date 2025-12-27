@@ -23,8 +23,7 @@ Download the Discord Social SDK from the Discord Developer Portal:
 
 ### Plugin Setup
 1. Copy the plugin to your project's `Plugins` folder
-2. Build project and enable plugin in "Plugins" and in "Project settings" -> "Plugins" section 
-
+2. Build project and enable rich presence in "Editor preferences"-> "Plugins" section 
 
 ## Configuration
 
