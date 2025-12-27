@@ -8,11 +8,6 @@ UPresenceSettings::UPresenceSettings(const FObjectInitializer& ObjectInitializer
 	
 }
 
-void UPresenceSettings::UpdatePresence()
-{
-	SaveConfig();
-}
-
 void UPresenceSettings::PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent)
 {
 	Super::PostEditChangeProperty(PropertyChangedEvent);

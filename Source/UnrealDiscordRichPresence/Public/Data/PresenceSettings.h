@@ -12,16 +12,13 @@ DECLARE_MULTICAST_DELEGATE_OneParam(FOnPresenceSettingsChanged, bool);
 /**
  * 
  */
-UCLASS(Config=Game, DefaultConfig, DisplayName="Discrord presence")
+UCLASS(Config=EditorPerProjectUserSettings, DisplayName="Discord presence")
 class UNREALDISCORDRICHPRESENCE_API UPresenceSettings : public UDeveloperSettings
 {
 	GENERATED_BODY()
 public:
 
 	UPresenceSettings(const FObjectInitializer& ObjectInitializer);
-
-	UFUNCTION(CallInEditor)
-	void UpdatePresence();
 	
 	UPROPERTY(EditAnywhere, Config, Category="Presence settings")
 	bool bShowPresence {false};
