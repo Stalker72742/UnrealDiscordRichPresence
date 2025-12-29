@@ -7,6 +7,7 @@
 #include "Core/FAssetFocusTracker.h"
 #include "Data/PresenceSettings.h"
 #include "Data/UnrealPresenceLog.h"
+#include "Engine/World.h"
 
 #define LOCTEXT_NAMESPACE "FUnrealDiscordRichPresenceModule"
 
@@ -62,6 +63,7 @@ void FUnrealDiscordRichPresenceModule::StartupModule()
 	{
 		if (PresenceSettings->bShowPresence)
 		{
+#if ENGINE_MAJOR_VERSION == 5 && ENGINE_MINOR_VERSION >= 2
 			FWorldDelegates::OnWorldInitializedActors.AddLambda([this](const FActorsInitializedParams& IVS)
 			{
 				if (TickableEditorObject) return;
@@ -82,6 +84,11 @@ void FUnrealDiscordRichPresenceModule::StartupModule()
 				});
 				FocusTrackerObject->Initialize();
 			});
+#elif (ENGINE_MAJOR_VERSION == 4 && ENGINE_MINOR_VERSION >= 27) || \
+	(ENGINE_MAJOR_VERSION == 5 && ENGINE_MINOR_VERSION <= 1)
+
+			FWorldDelegates::OnWorldInitializedActors.AddRaw(this, &FUnrealDiscordRichPresenceModule::OnLevelLoaded);
+#endif
 		}
 
 		PresenceSettings->OnSettingsChangedDelegate.AddRaw(this, &FUnrealDiscordRichPresenceModule::RestartPresence);
@@ -91,13 +98,34 @@ void FUnrealDiscordRichPresenceModule::StartupModule()
 	}
 }
 
+void FUnrealDiscordRichPresenceModule::OnLevelLoaded(const UWorld::FActorsInitializedParams& InParams)
+{
+	if (TickableEditorObject) return;
+
+	TickableEditorObject = new FDiscordTicker();
+
+	UE_LOG(LogUnrealPresence, Log, TEXT("Discord presence started"));
+
+	FocusTrackerObject = new FAssetFocusTracker();
+	FocusTrackerObject->OnAssetFocusChanged.BindLambda([this](const FString& AssetName)
+	{
+		UE_LOG(LogUnrealPresence, Log, TEXT("Focused: %s"), *AssetName);
+
+		if (TickableEditorObject)
+		{
+			TickableEditorObject->SetState(AssetName);
+		}
+	});
+	FocusTrackerObject->Initialize();
+}
+
 void FUnrealDiscordRichPresenceModule::ShutdownModule()
 {
 	if (TickableEditorObject)
 	{
 		delete TickableEditorObject;
 	}
-
+	
 	if (FocusTrackerObject)
 	{
 		delete FocusTrackerObject;

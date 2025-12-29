@@ -73,7 +73,11 @@ FDiscordTicker::~FDiscordTicker()
 		}
         
 		Client->RemoveFromRoot();
+#if ENGINE_MAJOR_VERSION == 5 
 		Client->MarkAsGarbage();
+#elif ENGINE_MAJOR_VERSION  == 4
+		Client->BeginDestroy();
+#endif
 		Client = nullptr;
 	}
 }

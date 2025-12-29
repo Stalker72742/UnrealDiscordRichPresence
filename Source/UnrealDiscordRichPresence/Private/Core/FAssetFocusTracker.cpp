@@ -41,7 +41,12 @@ void FAssetFocusTracker::HandleTabChanged(TSharedPtr<SDockTab> PrevTab, TSharedP
 {
 	if (!NewTab.IsValid()) return;
 
+#if ENGINE_MAJOR_VERSION == 5
 	TSharedPtr<FTabManager> TabManager = NewTab->GetTabManagerPtr();
+#elif ENGINE_MAJOR_VERSION == 4
+	TSharedPtr<FTabManager> TabManager = NewTab->GetTabManager();
+#endif
+	
 	if (!TabManager.IsValid()) return;
         
 	TSharedPtr<SDockTab> OwnerTab = TabManager->GetOwnerTab();

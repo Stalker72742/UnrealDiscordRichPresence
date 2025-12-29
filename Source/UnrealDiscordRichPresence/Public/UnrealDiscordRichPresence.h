@@ -14,6 +14,17 @@ class FUnrealDiscordRichPresenceModule : public IModuleInterface
 protected:
 	
 	UPresenceSettings* PresenceSettings {nullptr};
+
+protected:
+
+#if ENGINE_MAJOR_VERSION == 5
+	
+	UFUNCTION()
+	void OnLevelLoaded(const UWorld::FActorsInitializedParams& InParams);
+#elif ENGINE_MAJOR_VERSION == 4
+	UFUNCTION()
+	void OnLevelLoaded(const UWorld::FActorsInitializedParams& InParams);
+#endif
 	
 protected:
 
